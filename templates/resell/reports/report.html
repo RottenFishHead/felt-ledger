@@ -22,7 +22,7 @@
 {% elif f.kind == "number" %}
 <form method="get" class="filter-row range-form">{% for k, v in f.keep %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
 <div class="field"><label for="{{ f.name }}">{{ f.label }}</label><small class="help">{{ f.help }}</small>
-<input type="number" id="{{ f.name }}" name="{{ f.name }}" value="{{ f.value }}" min="0" max="50" step="0.1" inputmode="decimal"></div>
+<input type="text" id="{{ f.name }}" name="{{ f.name }}" value="{{ f.value }}" inputmode="decimal" autocomplete="off"></div>
 <button class="btn btn-primary btn-sm">Update</button></form>
 {% endif %}
 {% endfor %}

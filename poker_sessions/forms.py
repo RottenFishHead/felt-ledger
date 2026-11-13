@@ -22,6 +22,8 @@ class SessionForm(forms.ModelForm):
         widgets = {
             "game": forms.Select(),
             "stakes": forms.Select(),
+            "buy_in": forms.TextInput(attrs={"inputmode": "decimal", "autocomplete": "off", "placeholder": "0.00"}),
+            "cash_out": forms.TextInput(attrs={"inputmode": "decimal", "autocomplete": "off", "placeholder": "0.00"}),
             "notes": forms.Textarea(attrs={"rows": 3}),
         }
 

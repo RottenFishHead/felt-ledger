@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import MinValueValidator
 from django.db import transaction
 from django.utils import timezone
 from . import locations
@@ -46,8 +47,17 @@ class ItemForm(forms.ModelForm):
 
 # ---------------------------------------------------------------- widgets
 
+def number_input(placeholder=""):
+    """A plain text box that opens the number keypad on phones. Unlike type="number", it has no arrows and the
+    mouse wheel can't change the amount. The form field still checks that it's a valid, non-negative number."""
+    attrs = {"inputmode": "decimal", "autocomplete": "off"}
+    if placeholder:
+        attrs["placeholder"] = placeholder
+    return forms.TextInput(attrs=attrs)
+
+
 def money_input(placeholder="0.00"):
-    return forms.NumberInput(attrs={"step": "0.01", "min": "0", "inputmode": "decimal", "placeholder": placeholder})
+    return number_input(placeholder)
 
 
 def date_input():
@@ -496,14 +506,15 @@ class ExpenseForm(forms.ModelForm):
             "date": date_input(),
             "category": forms.RadioSelect,
             "amount": money_input(),
-            "miles": forms.NumberInput(attrs={"step": "0.1", "min": "0", "inputmode": "decimal"}),
-            "mileage_rate": forms.NumberInput(attrs={"step": "0.001", "min": "0", "inputmode": "decimal"}),
+            "miles": number_input(),
+            "mileage_rate": number_input(),
             "receipt": forms.ClearableFileInput(attrs={"accept": "image/*,application/pdf"}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["amount"].required = False
+        self.fields["mileage_rate"].validators.append(MinValueValidator(0))
         if not self.instance.mileage_rate:
             self.initial.setdefault("mileage_rate", default_mileage_rate())
 
@@ -563,5 +574,5 @@ class PlatformForm(forms.ModelForm):
             "collects_sales_tax": "Most marketplaces (eBay, Poshmark, Mercari, Etsy…) do. Untick for in-person or "
                                   "direct sales, where you may need to collect it yourself.",
         }
-        widgets = {"fee_percent": forms.NumberInput(attrs={"step": "0.01", "min": "0", "inputmode": "decimal"}),
+        widgets = {"fee_percent": number_input(),
                    "fee_fixed": money_input()}
