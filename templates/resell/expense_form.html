@@ -1,0 +1,19 @@
+{% extends "resell/form_page.html" %}
+{% block title %}{% if expense %}Edit expense{% else %}Add an expense{% endif %} · Resell Ledger{% endblock %}
+{% block eyebrow %}{% if expense %}EDIT EXPENSE{% else %}I SPENT MONEY{% endif %}{% endblock %}
+{% block heading %}{% if expense %}Edit <em>expense.</em>{% else %}Add an <em>expense.</em>{% endif %}{% endblock %}
+{% block intro %}<p class="muted">For running the business — supplies, mileage, subscriptions, storage. <strong>Not</strong> for the items you buy to resell; add those with <a class="link" href="{% url 'resell:item-create' %}">I bought something</a>.</p>{% endblock %}
+{% block fields %}
+{% include "resell/_field.html" with field=form.category %}
+{% include "resell/_field.html" with field=form.date %}
+<div class="mileage-fields" data-show-for="mileage">
+<div class="help-box">For mileage, just enter the miles — the dollar amount is worked out for you.</div>
+<div class="form-grid">{% include "resell/_field.html" with field=form.miles %}{% include "resell/_field.html" with field=form.mileage_rate %}</div>
+</div>
+<div class="amount-field" data-hide-for="mileage">{% include "resell/_field.html" with field=form.amount %}</div>
+{% include "resell/_field.html" with field=form.description %}
+{% include "resell/_field.html" with field=form.receipt %}
+{% if expense.receipt %}<p class="small-print">{% if expense.receipt_is_image %}<img class="receipt-preview" src="{{ expense.receipt.url }}" alt="Current receipt">{% else %}<a class="link" href="{{ expense.receipt.url }}" target="_blank" rel="noopener">View current receipt (PDF) ↗</a>{% endif %}</p>{% endif %}
+{% endblock %}
+{% block submit %}{% if expense %}Save changes{% else %}Save expense{% endif %}{% endblock %}
+{% block cancel %}{% url 'resell:expense-list' %}{% endblock %}

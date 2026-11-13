@@ -1,0 +1,6 @@
+<nav class="stats-tabs" aria-label="Statistics filters">
+<a href="{% url 'statistics-month' %}"{% if mode == "month" %} aria-current="page"{% endif %}>By month</a>
+<a href="{% url 'statistics-year' %}"{% if mode == "year" %} aria-current="page"{% endif %}>By year</a>
+<a href="{% url 'statistics-limit' %}"{% if mode == "limit" %} aria-current="page"{% endif %}>By stakes</a>
+<a href="{% url 'statistics-location' %}"{% if mode == "location" %} aria-current="page"{% endif %}>By location</a>
+</nav>

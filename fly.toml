@@ -1,0 +1,32 @@
+# Felt Ledger on Fly.io. `fly launch --copy-config` replaces `app` with the name you choose.
+app = "felt-ledger"
+primary_region = "lax"
+console_command = "/code/manage.py shell"
+
+[build]
+
+[env]
+  DJANGO_DEBUG = "0"
+  DJANGO_DATA_DIR = "/data"
+  # Photos and database backups go here once the keys are set: fly secrets set R2_ACCESS_KEY_ID=… R2_SECRET_ACCESS_KEY=…
+  R2_ENDPOINT_URL = "https://4b461b1a1df6add31d92a288e6a545eb.r2.cloudflarestorage.com"
+  R2_BUCKET = "journal-media"
+
+# SQLite database (and uploaded photos/receipts until R2 is set up) live on this volume and survive deploys.
+# Keep exactly ONE machine: a second machine would get its own volume and its own separate database.
+[mounts]
+  source = "felt_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1

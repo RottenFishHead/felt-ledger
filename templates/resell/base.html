@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block app %}resell{% endblock %}
+{% block title %}Resell Ledger{% endblock %}
+{% block brand %}<a class="brand" href="{% url 'resell:home' %}"><span class="brand-icon">$</span> RESELL<span>LEDGER</span></a>{% endblock %}
+{% block app_switch %}<a class="app-switch" href="{% url 'dashboard' %}">Go to Poker →</a>{% endblock %}
+{% block nav %}{% load resell_extras %}{% report_menu as report_groups %}<nav class="nav nav-resell" aria-label="Resell navigation">
+<a href="{% url 'resell:home' %}"{% if current == "home" %} aria-current="page"{% endif %}><span aria-hidden="true">⌂</span><span>Home</span></a>
+<details class="nav-menu{% if current|slice:':5' == 'item-' or current|slice:':8' == 'listing-' or current|slice:':6' == 'photo-' or current|slice:':7' == 'source-' or current|slice:':9' == 'platform-' or current|slice:':9' == 'category-' or current|slice:':12' == 'subcategory-' %} is-current{% endif %}">
+<summary><span aria-hidden="true">▤</span><span>Items</span></summary>
+<div class="nav-dropdown">
+<a href="{% url 'resell:item-list' %}"{% if current == "item-list" %} aria-current="page"{% endif %}>My items</a>
+<a href="{% url 'resell:item-create' %}"{% if current == "item-create" %} aria-current="page"{% endif %}>Add an item</a>
+<a href="{% url 'resell:category-list' %}"{% if current == "category-list" %} aria-current="page"{% endif %}>Item types</a>
+<a href="{% url 'resell:source-list' %}"{% if current == "source-list" %} aria-current="page"{% endif %}>Places I buy</a>
+<a href="{% url 'resell:platform-list' %}"{% if current == "platform-list" %} aria-current="page"{% endif %}>Sites I sell on</a>
+</div></details>
+<details class="nav-menu{% if current|slice:':8' == 'expense-' %} is-current{% endif %}">
+<summary><span aria-hidden="true">✎</span><span>Expenses</span></summary>
+<div class="nav-dropdown">
+<a href="{% url 'resell:expense-list' %}"{% if current == "expense-list" %} aria-current="page"{% endif %}>All expenses</a>
+<a href="{% url 'resell:expense-create' %}"{% if current == "expense-create" %} aria-current="page"{% endif %}>Add an expense</a>
+<a href="{% url 'resell:report-expenses' %}">Expenses by category</a>
+<a href="{% url 'resell:report-mileage' %}">Mileage log</a>
+</div></details>
+<details class="nav-menu nav-menu-wide{% if current|slice:':7' == 'report-' %} is-current{% endif %}">
+<summary><span aria-hidden="true">◔</span><span>Reports</span></summary>
+<div class="nav-dropdown nav-mega">
+{% for group, entries in report_groups %}<div class="nav-group"><div class="nav-group-title">{{ group }}</div>
+{% for name, title, description in entries %}{% with "resell:"|add:name as url_name %}<a href="{% url url_name %}"{% if current == name %} aria-current="page"{% endif %}>{{ title }}</a>{% endwith %}{% endfor %}
+</div>{% endfor %}
+<a class="nav-all" href="{% url 'resell:report-index' %}"{% if current == "report-index" %} aria-current="page"{% endif %}>All reports →</a>
+</div></details>
+<a href="{% url 'resell:help' %}"{% if current == "help" %} aria-current="page"{% endif %}><span aria-hidden="true">?</span><span>Help</span></a>
+</nav>{% endblock %}
+{% block tagline %}<div class="small">BUY SMART. SELL SMARTER.</div><div class="muted">Every item, every sale, every dollar.</div>{% endblock %}
+{% block footer %}RESELL LEDGER <span>STUCK? TAP “HELP” IN THE MENU</span>{% endblock %}

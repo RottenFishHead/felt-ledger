@@ -1,0 +1,53 @@
+{% extends "resell/base.html" %}{% load resell_extras %}
+{% block title %}{{ report.title }} · Reports · Resell Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent"><a href="{% url 'resell:report-index' %}">REPORTS</a> / {{ report.group|upper }}</div>
+<h1>{{ report.title }}</h1>
+<p class="muted">{{ report.description }}</p></div>
+<a class="btn btn-muted" href="{{ pdf_url }}" download>⤓ Download PDF</a></div>
+
+{% if filters %}<div class="report-filters">
+{% for f in filters %}
+{% if f.kind == "dates" %}
+<div class="filter-row"><span class="filter-label">{{ f.label }}</span>
+<nav class="stats-tabs" aria-label="Choose dates">{% for label, href, active in f.tabs %}<a href="{{ href }}"{% if active %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}</nav>
+<details class="custom-dates"{% if f.custom %} open{% endif %}><summary>Pick your own dates</summary>
+<form method="get" class="range-form">{% for k, v in f.keep %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
+<div class="field"><label for="start">From</label><input type="date" id="start" name="start" value="{{ f.start|date:'Y-m-d' }}" required></div>
+<div class="field"><label for="end">To</label><input type="date" id="end" name="end" value="{{ f.end|date:'Y-m-d' }}" required></div>
+<button class="btn btn-primary btn-sm">Show</button></form></details></div>
+{% elif f.kind == "tabs" %}
+<div class="filter-row"><span class="filter-label">{{ f.label }}</span>
+<nav class="stats-tabs" aria-label="{{ f.label }}">{% for label, href, active in f.tabs %}<a href="{{ href }}"{% if active %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}</nav></div>
+{% elif f.kind == "number" %}
+<form method="get" class="filter-row range-form">{% for k, v in f.keep %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
+<div class="field"><label for="{{ f.name }}">{{ f.label }}</label><small class="help">{{ f.help }}</small>
+<input type="number" id="{{ f.name }}" name="{{ f.name }}" value="{{ f.value }}" min="0" max="50" step="0.1" inputmode="decimal"></div>
+<button class="btn btn-primary btn-sm">Update</button></form>
+{% endif %}
+{% endfor %}
+</div>{% endif %}
+
+<p class="report-period"><strong>{{ report.period }}</strong></p>
+
+{% if report.stats %}<div class="stats report-stats">{% for stat in report.stats %}
+<div class="stat{% if forloop.first %} stat-primary{% endif %}"><div class="stat-label">{{ stat.label }}</div>
+<div class="stat-number{% if stat.kind == 'text' %} stat-text{% endif %}">{{ stat.value|cell:stat.kind }}{% if stat.kind == "days" and stat.value is not None %}<small> days</small>{% endif %}</div>
+{% if stat.foot %}<div class="stat-foot">{{ stat.foot }}</div>{% endif %}</div>
+{% endfor %}</div>{% endif %}
+
+{% for note in report.notes %}<p class="help-tip">{{ note }}</p>{% endfor %}
+
+{% for table in report.tables %}
+<section class="panel report-section" aria-labelledby="t{{ forloop.counter }}"><div class="panel-head"><h2 id="t{{ forloop.counter }}">{{ table.title }}</h2></div>
+{% if table.rows %}
+<div class="{% if table.statement %}statement-scroll{% else %}table-scroll{% endif %}"><table class="{% if table.statement %}statement{% if table.columns|length > 3 %} wide{% endif %}{% endif %}">
+<thead><tr>{% for label, right in table.header %}<th{% if right %} class="right"{% endif %}>{{ label|upper }}</th>{% endfor %}</tr></thead>
+<tbody>{% for style, cells in table.body %}<tr{% if style %} class="line-{{ style }}"{% endif %}>
+{% for value, label, kind, right in cells %}<td data-label="{{ label }}"{% if right %} class="right"{% endif %}>{{ value|cell:kind }}</td>{% endfor %}
+</tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="muted">{{ table.empty }}</p>{% endif %}
+{% if table.note and table.rows %}<p class="muted small-print">{{ table.note }}</p>{% endif %}
+</section>
+{% endfor %}
+{% endblock %}

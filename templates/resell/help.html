@@ -1,0 +1,75 @@
+{% extends "resell/base.html" %}
+{% block title %}Help · Resell Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent">RESELL / HELP</div><h1>How to <em>use this.</em></h1>
+<p class="muted">Short, step-by-step instructions for everything you'll do. You can't break anything — every step can be fixed or undone later.</p></div></div>
+
+<nav class="help-toc" aria-label="On this page"><strong>Jump to:</strong>
+<a href="#bought">I bought something</a><a href="#listed">I listed something</a><a href="#sold">Something sold</a><a href="#returned">It came back</a><a href="#rid">I got rid of it</a><a href="#expenses">Expenses & mileage</a><a href="#setup">Set-up</a><a href="#phone">Phone tips</a><a href="#numbers">What the numbers mean</a></nav>
+
+<article class="help-article">
+<section id="bought"><h2>When you buy something to resell</h2>
+<ol><li>Tap <strong>Home</strong> in the menu, then the big <strong>I bought something</strong> button.</li>
+<li>Type a short name, like “Coach purse, brown leather”.</li>
+<li>Enter the date and what you paid.</li>
+<li>Pick where you bought it. If it's somewhere new, type the name in the box just below the list.</li>
+<li>Tap <strong>Photos</strong> to take pictures or choose them from your phone. You can add more later.</li>
+<li>Tap <strong>Save this item</strong> at the bottom. Done!</li></ol>
+<p class="help-tip">Bought a bag of 10 things at once? Add each item separately and split what you paid between them as best you can.</p></section>
+
+<section id="listed"><h2>When you list it for sale</h2>
+<ol><li>On <strong>Home</strong>, tap <strong>I listed something</strong>.</li>
+<li>Find the item and tap <strong>I listed it</strong>.</li>
+<li>Pick the site (eBay, Poshmark…) and type your asking price.</li>
+<li>Optional: paste the link to your listing so you can jump to it later.</li>
+<li>Tap <strong>Save the listing</strong>.</li></ol>
+<p class="help-tip">Listed on more than one site? Repeat these steps once for each site. That's called <em>cross-listing</em>, and it helps things sell faster.</p></section>
+
+<section id="sold"><h2>When something sells</h2>
+<ol><li>On <strong>Home</strong>, tap <strong>Something sold!</strong></li>
+<li>Find the item and tap <strong>It sold</strong>.</li>
+<li>Open the sale on the selling site's app. Copy the sale price, shipping and fees into the boxes.</li>
+<li>Tap <strong>Record the sale</strong>. You'll see your profit straight away.</li>
+<li><strong>Important:</strong> if it was listed on other sites too, take it down there. The home page will remind you under “Needs your attention”. Tap <strong>Done, I took it down</strong> once you have.</li></ol>
+<p class="help-tip">Don't know the fees? Leave that box empty and they'll be estimated. Typing the real number makes your profit more accurate.</p></section>
+
+<section id="returned"><h2>When a buyer returns something</h2>
+<ol><li>Open the item (tap <strong>My items</strong>, then tap the item).</li>
+<li>Tap <strong>The buyer returned it</strong>.</li>
+<li>Enter the date and any money you lost (return shipping, fees the site kept).</li>
+<li>Tap <strong>Record the return</strong>. The item goes back into your stock so you can sell it again.</li></ol></section>
+
+<section id="rid"><h2>When you donate, toss or keep something</h2>
+<ol><li>Open the item and tap <strong>I got rid of it</strong>.</li>
+<li>Pick the date and, if you like, say what happened.</li>
+<li>Tap <strong>Write it off</strong>. What you paid counts as a loss, which is normal.</li></ol>
+<p class="help-tip">Changed your mind? Open the item and tap <strong>Undo — I still have it</strong>.</p></section>
+
+<section id="expenses"><h2>Expenses and mileage</h2>
+<p>Expenses are things you spend to <em>run</em> the business: shipping supplies, a label printer, app subscriptions, storage, and driving.</p>
+<ol><li>Tap <strong>Expenses</strong> in the menu, then <strong>＋ Add an expense</strong>.</li>
+<li>Pick what kind it is and enter the amount.</li>
+<li>For <strong>Mileage / travel</strong>, just enter the miles. The dollar amount is worked out for you.</li>
+<li>Tap <strong>Receipt photo</strong> to snap the paper receipt. Very handy at tax time!</li>
+<li>Tap <strong>Save expense</strong>.</li></ol>
+<p class="help-tip">Items you buy to resell are <strong>not</strong> expenses — add those with “I bought something”.</p></section>
+
+<section id="setup"><h2>One-time set-up</h2>
+<ul><li><strong>Sites I sell on</strong> (on the Home page, at the bottom): eBay, Poshmark, Mercari and others are already there. Tap <strong>Edit</strong> on each one you use and enter its fees, so estimates are right.</li>
+<li><strong>Places I buy</strong>: add the address of stores you visit often to get a map and directions.</li></ul></section>
+
+<section id="phone"><h2>Phone tips</h2>
+<ul><li><strong>Add it to your home screen</strong> so it opens like an app. iPhone: tap the Share button, then “Add to Home Screen”. Android: tap the ⋮ menu, then “Add to Home screen”.</li>
+<li>Typing a date? Tap the date box and a calendar pops up.</li>
+<li>A green message at the top of the page means your changes were saved. A box with “Almost there!” means something needs fixing — look for the red writing.</li></ul></section>
+
+<section id="numbers"><h2>What the numbers mean</h2>
+<dl class="glossary">
+<dt>Profit (on an item)</dt><dd>Sale price + shipping the buyer paid, minus what you paid, fees, your shipping label and any other costs.</dd>
+<dt>Profit after expenses</dt><dd>Profit from everything you sold, minus your business expenses. This is what you really kept.</dd>
+<dt>Money tied up in stock</dt><dd>What you paid for everything you haven't sold yet.</dd>
+<dt>Return on what you paid</dt><dd>Profit compared with what you paid. 100% means you doubled your money.</dd>
+<dt>Written off</dt><dd>Items you won't sell. What you paid for them counts as a loss.</dd>
+</dl></section>
+</article>
+{% endblock %}

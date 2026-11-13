@@ -1,0 +1,45 @@
+{% load resell_extras %}<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>{{ report.title }}</title>
+<style>
+@page { size: letter{% if report.landscape %} landscape{% endif %}; margin: 1.6cm 1.4cm 2cm 1.4cm;
+  @frame footer { -pdf-frame-content: footer; bottom: 0.8cm; margin-left: 1.4cm; margin-right: 1.4cm; height: 0.8cm; } }
+body { font-family: Helvetica; font-size: 9.5pt; color: #0F172A; }
+h1 { font-size: 20pt; margin: 0 0 2pt 0; }
+h2 { font-size: 12pt; margin: 16pt 0 6pt 0; }
+.eyebrow { font-size: 8pt; color: #64748B; letter-spacing: 1pt; }
+.period { font-size: 10.5pt; margin: 0 0 10pt 0; }
+.muted { color: #64748B; }
+table { width: 100%; }
+th { font-size: 7.5pt; color: #64748B; text-align: left; border-bottom: 1pt solid #0F172A; padding: 3pt 4pt; }
+td { padding: 3pt 4pt; border-bottom: 0.5pt solid #E2E8F0; vertical-align: top; }
+.right { text-align: right; }
+.line-head td { font-weight: bold; color: #64748B; font-size: 8pt; padding-top: 8pt; border-bottom: 0; }
+.line-sub td { font-weight: bold; border-top: 0.5pt solid #0F172A; }
+.line-total td { font-weight: bold; font-size: 10.5pt; border-top: 1pt solid #0F172A; border-bottom: 1.5pt solid #0F172A; }
+.stats td { border: 0.5pt solid #E2E8F0; padding: 6pt; }
+.stat-label { font-size: 7pt; color: #64748B; letter-spacing: 0.5pt; }
+.stat-value { font-size: 13pt; font-weight: bold; }
+.note { font-size: 8pt; color: #64748B; margin-top: 4pt; }
+#footer { font-size: 7.5pt; color: #64748B; }
+</style></head>
+<body>
+<div class="eyebrow">RESELL LEDGER · {{ report.group|upper }}</div>
+<h1>{{ report.title }}</h1>
+<p class="period"><b>{{ report.period }}</b></p>
+
+{% if report.stats %}<table class="stats"><tr>{% for stat in report.stats %}
+<td><div class="stat-label">{{ stat.label }}</div><div class="stat-value">{{ stat.value|cell_text:stat.kind }}{% if stat.kind == "days" and stat.value is not None %} days{% endif %}</div>{% if stat.foot %}<div class="note">{{ stat.foot }}</div>{% endif %}</td>
+{% endfor %}</tr></table>{% endif %}
+
+{% for note in report.notes %}<p class="note">{{ note }}</p>{% endfor %}
+
+{% for table in report.tables %}
+<h2>{{ table.title }}</h2>
+{% if table.rows %}<table repeat="1"><thead><tr>{% for label, right in table.header %}<th{% if right %} class="right"{% endif %}>{{ label|upper }}</th>{% endfor %}</tr></thead>
+<tbody>{% for style, cells in table.body %}<tr{% if style %} class="line-{{ style }}"{% endif %}>{% for value, label, kind, right in cells %}<td{% if right %} class="right"{% endif %}>{{ value|cell_text:kind }}</td>{% endfor %}</tr>{% endfor %}</tbody></table>
+{% if table.note %}<p class="note">{{ table.note }}</p>{% endif %}
+{% else %}<p class="muted">{{ table.empty }}</p>{% endif %}
+{% endfor %}
+
+<div id="footer">{{ report.title }} · {{ report.period }} · Made {{ generated|date:"M j, Y g:i A" }} · Page <pdf:pagenumber> of <pdf:pagecount></div>
+</body></html>

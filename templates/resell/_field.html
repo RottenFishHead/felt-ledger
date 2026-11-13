@@ -1,0 +1,18 @@
+{% comment %}One form field with its label, plain-English hint and any error. Use: {% include "resell/_field.html" with field=form.title %}{% endcomment %}
+<div class="field{% if wide %} wide{% endif %}{% if field.errors %} has-error{% endif %}">
+{% if field.widget_type == "radioselect" or field.widget_type == "checkboxselectmultiple" or field.widget_type == "categorypicker" %}
+<fieldset><legend>{{ field.label }}{% if field.field.required %} <span class="req">(required)</span>{% endif %}</legend>
+{% if field.help_text %}<small class="help">{{ field.help_text }}</small>{% endif %}
+{% if field.widget_type == "categorypicker" %}{{ field }}{% else %}<div class="choices">{{ field }}</div>{% endif %}
+{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</fieldset>
+{% elif field.widget_type == "checkbox" %}
+<label class="check-row">{{ field }}<span>{{ field.label }}</span></label>
+{% if field.help_text %}<small class="help">{{ field.help_text }}</small>{% endif %}
+{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+{% else %}
+<label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="req">(required)</span>{% endif %}</label>
+{% if field.help_text %}<small class="help">{{ field.help_text }}</small>{% endif %}
+{{ field }}
+{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+{% endif %}
+</div>

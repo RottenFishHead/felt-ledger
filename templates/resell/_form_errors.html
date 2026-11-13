@@ -1,0 +1,2 @@
+{% if form.errors %}<div class="form-alert" role="alert"><strong>Almost there!</strong> Please fix the {% if form.non_field_errors %}problem{% else %}boxes marked in red{% endif %} below, then tap the button again.
+{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}

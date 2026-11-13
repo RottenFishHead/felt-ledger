@@ -1,0 +1,19 @@
+{% load static %}<!doctype html>
+<html lang="en" data-app="{% block app %}poker{% endblock %}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#FFFFFF">
+<title>{% block title %}Donkey Ledger{% endblock %}</title><link rel="stylesheet" href="{% static 'css/style.css' %}">
+<script src="{% static 'js/app.js' %}" defer></script></head>
+<body><div class="shell"><aside class="sidebar"><div class="sidebar-top">{% block brand %}<a class="brand" href="{% url 'dashboard' %}"><span class="brand-icon">♠</span> DONKEY<span>LEDGER</span></a>{% endblock %}
+{% if can_use_resell %}{% block app_switch %}<a class="app-switch" href="{% url 'resell:home' %}">Go to Resell →</a>{% endblock %}{% endif %}</div>
+{% with current=request.resolver_match.url_name %}{% block nav %}<nav class="nav" aria-label="Main navigation"><a href="{% url 'dashboard' %}"{% if current == "dashboard" %} aria-current="page"{% endif %}><span aria-hidden="true">◈</span><span>Dashboard</span></a>
+<a href="{% url 'session-list' %}"{% if current == "session-list" %} aria-current="page"{% endif %}><span aria-hidden="true">▤</span><span>Sessions</span></a>
+<a href="{% url 'statistics-month' %}"{% if current|slice:":11" == "statistics-" %} aria-current="page"{% endif %}><span aria-hidden="true">◷</span><span>Filtered stats</span></a>
+<a href="{% url 'session-create' %}"{% if current == "session-create" %} aria-current="page"{% endif %}><span aria-hidden="true">⊕</span><span>New session</span></a></nav>{% endblock %}{% endwith %}
+<div class="sidebar-bottom">{% block tagline %}<div class="small">PLAY THE LONG GAME.</div><div class="muted">Track every hour. Know your edge.</div>{% endblock %}
+{% if user.is_authenticated %}<div class="profile"><span class="avatar">{{ user.username|slice:":1"|upper }}</span><span>{{ user.username }}</span></div>
+<form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="text-button">Sign out ↗</button></form>
+{% else %}<a href="{% url 'login' %}">Sign in</a>{% endif %}</div></aside>
+<main class="main">
+{% if messages %}<div class="messages" role="status">{% for message in messages %}<p class="message message-{{ message.tags }}">{{ message }}</p>{% endfor %}</div>{% endif %}
+{% block content %}{% endblock %}
+<footer class="footer">{% block footer %}DONKEY LEDGER <span>MADE FOR THE GRIND · NOT THE GLORY</span>{% endblock %}</footer>
+</main></div></body></html>

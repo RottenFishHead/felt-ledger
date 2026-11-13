@@ -1,0 +1,11 @@
+# Keep local data, uploads and tooling out of the server image.
+.venv/
+db.sqlite3*
+media/
+staticfiles/
+**/__pycache__/
+*.pyc
+.git/
+.vscode/
+.DS_Store
+fly.toml

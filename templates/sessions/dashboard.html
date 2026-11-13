@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}Dashboard · Donkey Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent">YOUR PERFORMANCE / OVERVIEW</div><h1>The numbers <em>don't bluff.</em></h1><p class="muted">A clear view of your sessions, results, and the hours behind them.</p></div><span class="suit">♠</span></div>
+<div class="stats">
+<div class="stat stat-primary"><div class="stat-label">TOTAL NET PROFIT <span>↗</span></div><div class="stat-number {% if profit < 0 %}loss{% endif %}">{% if profit > 0 %}+{% endif %}${{ profit|floatformat:2 }}</div><div class="stat-foot">From {{ completed_count }} completed session{{ completed_count|pluralize }}</div></div>
+<div class="stat"><div class="stat-label">WINNING SESSIONS <span class="gain">▲</span></div><div class="stat-number gain">{{ wins|stringformat:"02d" }}</div><div class="stat-foot">Finished ahead</div></div>
+<div class="stat"><div class="stat-label">LOSING SESSIONS <span class="loss">▼</span></div><div class="stat-number loss">{{ losses|stringformat:"02d" }}</div><div class="stat-foot">Finished behind</div></div>
+<div class="stat"><div class="stat-label">HOURLY RATE <span>◎</span></div><div class="stat-number {% if hourly_rate < 0 %}loss{% endif %}">${{ hourly_rate|floatformat:2 }}<small>/hr</small></div><div class="stat-foot">Net profit per hour played</div></div>
+</div>
+<div class="dashboard-grid">
+<section class="panel chart-panel"><div class="panel-head"><div><div class="eyebrow">THE BIG PICTURE</div><h2>Profit trajectory</h2></div><span class="tiny-tag">ALL TIME</span></div>
+{% if chart_points %}<div class="chart-wrap"><svg id="profit-chart" role="img" aria-label="Cumulative net profit over completed sessions" viewBox="0 0 700 260" preserveAspectRatio="none"></svg></div>
+<div class="chart-axis"><span>FIRST SESSION</span><span>LATEST SESSION</span></div>
+{{ chart_points|json_script:"profit-data" }}
+{% else %}<div class="empty-chart"><span>♧</span><p>Your story starts with the first session.</p><a href="{% url 'session-create' %}">Record one →</a></div>{% endif %}
+</section>
+<section class="panel split-panel"><div class="panel-head"><div><div class="eyebrow">THE SCORECARD</div><h2>Amount won/lost this month</h2></div></div>
+<div class="split-visual monthly-total"><div class="split-inner"><strong class="{% if won_this_month < 0 %}loss{% endif %}">${{ won_this_month|floatformat:2 }}</strong><span>NET THIS MONTH</span></div></div>
+<div class="legend"><span><i class="key gain-key"></i> Wins <strong>{{ wins }}</strong></span><span><i class="key loss-key"></i> Losses <strong>{{ losses }}</strong></span></div>
+</section></div>
+{% if active %}<div class="live-strip"><div><span class="live-dot"></span><strong>{% if active.status == "running" %}SESSION IN PROGRESS{% else %}SESSION PAUSED{% endif %}</strong><span class="muted">Session #{{ active.pk }}</span></div><a href="{{ active.get_absolute_url }}">Go to live timer →</a></div>{% endif %}
+<section class="panel recent"><div class="panel-head"><div><div class="eyebrow">THE LOGBOOK</div><h2>Recent sessions</h2></div><a class="link" href="{% url 'session-list' %}">View all sessions ↗</a></div>
+{% include "sessions/_table.html" with sessions=recent %}
+</section>
+{% endblock %}

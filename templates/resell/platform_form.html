@@ -1,0 +1,7 @@
+{% extends "resell/form_page.html" %}
+{% block title %}Selling site · Resell Ledger{% endblock %}
+{% block eyebrow %}SITES I SELL ON{% endblock %}
+{% block heading %}{% if platform.pk %}Edit <em>{{ platform }}</em>{% else %}Add a <em>site.</em>{% endif %}{% endblock %}
+{% block intro %}<div class="help-box"><strong>Where do I find the fees?</strong> Search the web for “<em>site name</em> seller fees”, or look at the fees on a recent sale. These numbers are only used to <em>estimate</em> fees when you leave the fees box empty on a sale.</div>{% endblock %}
+{% block submit %}Save site{% endblock %}
+{% block cancel %}{% url 'resell:platform-list' %}{% endblock %}

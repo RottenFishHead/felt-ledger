@@ -1,0 +1,63 @@
+{% extends "resell/base.html" %}{% load resell_extras %}
+{% block title %}Home · Resell Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent">RESELL / HOME</div>
+<h1>What would you <em>like to do?</em></h1>
+<p class="muted">Tap a big button below. Every page tells you exactly what to fill in, and nothing is saved until you tap the button at the bottom.</p></div></div>
+
+<nav class="action-grid" aria-label="Main actions">
+<a class="action" href="{% url 'resell:item-create' %}"><span class="action-icon" aria-hidden="true">＋</span><strong>I bought something</strong><span>Add a new item to your stock.</span></a>
+<a class="action" href="{% url 'resell:item-list' %}?action=list"><span class="action-icon" aria-hidden="true">↗</span><strong>I listed something</strong><span>Put an item up on eBay, Poshmark…</span></a>
+<a class="action action-primary" href="{% url 'resell:item-list' %}?action=sell"><span class="action-icon" aria-hidden="true">$</span><strong>Something sold!</strong><span>Record the sale and see your profit.</span></a>
+<a class="action" href="{% url 'resell:expense-create' %}"><span class="action-icon" aria-hidden="true">✎</span><strong>I spent money</strong><span>Supplies, mileage, subscriptions.</span></a>
+</nav>
+
+{% if to_delist or sitting %}
+<section class="attention" aria-labelledby="attention-title">
+<h2 id="attention-title">Needs your attention</h2>
+{% if to_delist %}
+<p class="muted">These items already sold or were written off, but are still listed on another site. Take each listing down so nobody buys it twice, then tap <strong>Done</strong>.</p>
+<ul class="todo-list">{% for listing in to_delist %}
+<li><div><strong>{{ listing.item }}</strong><span class="muted">Still up on {{ listing.platform }}{% if listing.url %} · <a class="link" href="{{ listing.url }}" target="_blank" rel="noopener">Open listing ↗</a>{% endif %}</span></div>
+<form method="post" action="{% url 'resell:listing-end' listing.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{% url 'resell:home' %}"><button class="btn btn-muted btn-sm">Done, I took it down</button></form></li>
+{% endfor %}</ul>
+{% endif %}
+{% if sitting %}<p><a class="link" href="{% url 'resell:item-list' %}?show=sitting">{{ sitting }} item{{ sitting|pluralize }} {{ sitting|pluralize:"has,have" }} been in stock for over 90 days →</a> <span class="muted">Consider lowering the price or listing on another site.</span></p>{% endif %}
+</section>
+{% endif %}
+
+<section class="home-section" aria-labelledby="month-title">
+<div class="section-head"><div><div class="eyebrow">{{ today|date:"F Y"|upper }}</div><h2 id="month-title">This month</h2></div></div>
+<div class="stats">
+<div class="stat stat-primary"><div class="stat-label">PROFIT AFTER EXPENSES</div><div class="stat-number">{{ month.net|money }}</div><div class="stat-foot">What you actually kept this month</div></div>
+<div class="stat"><div class="stat-label">ITEMS SOLD</div><div class="stat-number">{{ month.count }}</div><div class="stat-foot">{{ month.sales|money }} in sales</div></div>
+<div class="stat"><div class="stat-label">PROFIT ON ITEMS</div><div class="stat-number {{ month.profit|tone }}">{{ month.profit|money }}</div><div class="stat-foot">After cost, fees and shipping</div></div>
+<div class="stat"><div class="stat-label">EXPENSES</div><div class="stat-number">{{ month.expenses|money }}</div><div class="stat-foot"><a class="link" href="{% url 'resell:expense-list' %}">See expenses →</a></div></div>
+</div>
+<p class="year-line muted">So far in {{ today.year }}: {{ year.count }} item{{ year.count|pluralize }} sold · {{ year.sales|money }} in sales · <strong class="{{ year.net|tone }}">{{ year.net|money }}</strong> profit after expenses.</p>
+</section>
+
+<section class="home-section" aria-labelledby="stock-title">
+<div class="section-head"><div><div class="eyebrow">YOUR STOCK</div><h2 id="stock-title">What you have now</h2></div><a class="link" href="{% url 'resell:item-list' %}">See all items →</a></div>
+<div class="logbook-summary">
+<a class="stat stat-link" href="{% url 'resell:item-list' %}?show=unlisted"><div class="stat-label">NOT LISTED YET</div><div class="stat-number">{{ not_listed_count }}</div><div class="stat-foot">Ready to photograph and list →</div></a>
+<a class="stat stat-link" href="{% url 'resell:item-list' %}?show=listed"><div class="stat-label">LISTED FOR SALE</div><div class="stat-number">{{ listed_count }}</div><div class="stat-foot">Waiting for a buyer →</div></a>
+<div class="stat"><div class="stat-label">MONEY TIED UP IN STOCK</div><div class="stat-number">{{ money_tied_up|money }}</div><div class="stat-foot">What you paid for everything unsold</div></div>
+</div>
+</section>
+
+<section class="panel recent" aria-labelledby="sales-title">
+<div class="panel-head"><div><div class="eyebrow">LATEST</div><h2 id="sales-title">Recent sales</h2></div><a class="link" href="{% url 'resell:item-list' %}?show=sold">All sales →</a></div>
+{% if recent_sales %}<div class="table-scroll"><table><thead><tr><th>ITEM</th><th>SOLD ON</th><th>DATE</th><th class="right">PROFIT</th></tr></thead><tbody>
+{% for item in recent_sales %}<tr><td data-label="Item"><a class="table-title" href="{{ item.get_absolute_url }}">{{ item }}</a></td><td data-label="Sold on">{{ item.platform }}</td><td data-label="Date">{{ item.sale_date|date:"M j, Y" }}</td><td data-label="Profit" class="right"><span class="money {{ item.profit|tone }}">{{ item.profit|money:"signed" }}</span></td></tr>{% endfor %}
+</tbody></table></div>
+{% else %}<p class="muted">No sales yet. When something sells, tap <strong>Something sold!</strong> above.</p>{% endif %}
+</section>
+
+<section class="home-section settings-links" aria-labelledby="setup-title">
+<h2 id="setup-title" class="eyebrow">SET-UP</h2>
+<ul><li><a class="link" href="{% url 'resell:platform-list' %}">Sites I sell on</a> <span class="muted">— eBay, Poshmark… and their fees</span></li>
+<li><a class="link" href="{% url 'resell:source-list' %}">Places I buy</a> <span class="muted">— stores and sales, with addresses and maps</span></li>
+<li><a class="link" href="{% url 'resell:help' %}">Help & how-to</a> <span class="muted">— step-by-step instructions</span></li></ul>
+</section>
+{% endblock %}

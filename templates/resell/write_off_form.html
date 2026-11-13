@@ -1,0 +1,5 @@
+{% extends "resell/form_page.html" %}{% load resell_extras %}
+{% block title %}Get rid of it · Resell Ledger{% endblock %}
+{% block heading %}I got <em>rid of it.</em>{% endblock %}
+{% block intro %}<p class="muted">Use this when an item won't be sold: you donated it, threw it out, lost it or kept it for yourself. What you paid ({{ item.purchase_price|money }}) will count as a loss — that's normal and it's useful at tax time. You can undo this later.</p>{% endblock %}
+{% block submit %}Write it off{% endblock %}

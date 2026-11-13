@@ -1,0 +1,6 @@
+Django>=5.2,<5.3
+Pillow>=11
+gunicorn>=23
+whitenoise>=6.8
+django-storages[s3]>=1.14,<2
+xhtml2pdf>=0.2.16

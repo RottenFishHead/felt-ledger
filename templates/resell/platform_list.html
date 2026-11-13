@@ -1,0 +1,12 @@
+{% extends "resell/base.html" %}
+{% block title %}Sites I sell on · Resell Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent"><a href="{% url 'resell:home' %}">HOME</a> / SET-UP</div><h1>Sites <em>I sell on.</em></h1>
+<p class="muted">The places you list and sell items. The fee settings are used to <em>estimate</em> fees when you don't type them in on a sale.</p></div>
+<a class="btn btn-primary" href="{% url 'resell:platform-create' %}">＋ Add a site</a></div>
+<div class="help-box"><strong>One-time set-up:</strong> tap <strong>Edit</strong> on each site you use and enter its fees. Sites showing “No fees set” will estimate $0 in fees, which makes profit look higher than it really is — unless you type the real fees in on every sale.</div>
+<ul class="place-list">{% for platform in platforms %}<li>
+<div><strong>{{ platform }}</strong> <span class="row-sub">{% if platform.fee_percent or platform.fee_fixed %}{{ platform.fee_percent|floatformat:"-2" }}% of each sale{% if platform.fee_fixed %} + ${{ platform.fee_fixed }} per order{% endif %}{% else %}<span class="red">No fees set</span>{% endif %}</span></div>
+<div class="row-actions"><a class="link" href="{% url 'resell:platform-edit' platform.pk %}">Edit</a><a class="danger-link" href="{% url 'resell:platform-delete' platform.pk %}">Delete</a></div>
+</li>{% endfor %}</ul>
+{% endblock %}

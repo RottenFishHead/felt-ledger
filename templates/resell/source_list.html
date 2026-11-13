@@ -1,0 +1,13 @@
+{% extends "resell/base.html" %}
+{% block title %}Places I buy · Resell Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent"><a href="{% url 'resell:home' %}">HOME</a> / SET-UP</div><h1>Places <em>I buy.</em></h1>
+<p class="muted">Stores, sales and websites you buy from. New places are also added automatically when you type one on an item.</p></div>
+<a class="btn btn-primary" href="{% url 'resell:source-create' %}">＋ Add a place</a></div>
+{% if sources %}<ul class="place-list">{% for source in sources %}<li>
+<div><strong>{{ source }}</strong> <span class="muted">· {{ source.get_kind_display }} · {{ source.items.count }} item{{ source.items.count|pluralize }}</span>
+{% if source.has_address %}<span class="row-sub">{{ source.full_address }} · <a class="link" href="{{ source.map_url }}" target="_blank" rel="noopener">Map & directions ↗</a></span>{% else %}<span class="row-sub muted">No address — <a class="link" href="{% url 'resell:source-edit' source.pk %}">add one</a> to see a map.</span>{% endif %}</div>
+<div class="row-actions"><a class="link" href="{% url 'resell:source-edit' source.pk %}">Edit</a><a class="danger-link" href="{% url 'resell:source-delete' source.pk %}">Delete</a></div>
+</li>{% endfor %}</ul>
+{% else %}<div class="empty-state"><p>No places yet.</p></div>{% endif %}
+{% endblock %}

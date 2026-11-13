@@ -1,0 +1,5 @@
+{% extends "resell/form_page.html" %}
+{% block title %}Listing · Resell Ledger{% endblock %}
+{% block heading %}{% if listing %}Edit the <em>listing.</em>{% else %}I listed <em>it.</em>{% endif %}{% endblock %}
+{% block intro %}{% if not listing %}<p class="muted">Record each site you list this item on — one at a time. Listed it on eBay <em>and</em> Poshmark? Save this, then tap <strong>＋ Add a listing</strong> again for the second site.</p>{% endif %}{% endblock %}
+{% block submit %}{% if listing %}Save changes{% else %}Save the listing{% endif %}{% endblock %}

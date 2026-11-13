@@ -1,0 +1,17 @@
+# Local data and uploads (real user data — never commit)
+db.sqlite3*
+media/
+staticfiles/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets
+.env
+.env.*
+
+# Editor / OS
+.vscode/
+.DS_Store

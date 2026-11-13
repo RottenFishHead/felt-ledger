@@ -1,0 +1,102 @@
+{% extends "resell/base.html" %}{% load resell_extras %}
+{% block title %}{{ item }} · Resell Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent"><a href="{% url 'resell:item-list' %}">MY ITEMS</a> / <span class="status status-{{ item.status }}">{{ item.get_status_display }}</span></div>
+<h1>{{ item }}</h1>
+<p class="muted">{% if item.brand %}{{ item.brand }} · {% endif %}{% if item.size %}Size {{ item.size }} · {% endif %}{% if item.color %}{{ item.color }} · {% endif %}{{ item.get_condition_display }}</p></div>
+<a class="btn btn-muted" href="{% url 'resell:item-edit' item.pk %}">Edit details</a></div>
+
+{# ---- What to do next: the buttons depend on where the item is in its life ---- #}
+<section class="next-step" aria-labelledby="next-title">
+<h2 id="next-title" class="eyebrow">WHAT HAPPENED?</h2>
+{% if item.status == "inventory" or item.status == "returned" %}
+<p>{% if item.status == "returned" %}This item came back on {{ item.return_date|date:"M j, Y" }} and is in your stock again.{% else %}This item is in your stock but not listed anywhere yet.{% endif %}</p>
+{% if item.status == "returned" and item.storage_location %}<p class="shelve-in">Shelve it in <strong>{{ item.storage_location }}</strong>{% if item.location_history %}{% with previous=item.location_history|last %}<span class="muted"> · was {{ previous.location }}</span>{% endwith %}{% endif %}</p>{% endif %}
+<div class="next-buttons">
+<a class="btn btn-primary" href="{% url 'resell:listing-create' item.pk %}">I listed it for sale</a>
+<a class="btn btn-muted" href="{% url 'resell:item-sell' item.pk %}">It sold</a>
+<a class="btn btn-muted" href="{% url 'resell:item-write-off' item.pk %}">I got rid of it</a></div>
+{% elif item.status == "listed" %}
+<p>Listed on {% for listing in listings %}{% if listing.status == "active" %}{{ listing.platform }}{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}. Waiting for a buyer.</p>
+<div class="next-buttons">
+<a class="btn btn-primary" href="{% url 'resell:item-sell' item.pk %}">It sold!</a>
+<a class="btn btn-muted" href="{% url 'resell:listing-create' item.pk %}">I listed it on another site</a>
+<a class="btn btn-muted" href="{% url 'resell:item-write-off' item.pk %}">I got rid of it</a></div>
+{% elif item.status == "sold" %}
+<p>Sold on {{ item.platform }} on {{ item.sale_date|date:"M j, Y" }} — you made <strong class="{{ item.profit|tone }}">{{ item.profit|money }}</strong>.</p>
+{% if item.listings_to_end %}<div class="form-alert"><strong>Don't forget:</strong> it's still listed on {% for listing in item.listings_to_end %}{{ listing.platform }}{% if not forloop.last %}, {% endif %}{% endfor %}. Take it down there so nobody else buys it, then tap <strong>Taken down</strong> in the listings below.</div>{% endif %}
+{% if item.shipped_at and item.location_released_at %}<p>Shipped {{ item.shipped_at|date:"M j, Y" }}.{% if item.storage_location %} {{ item.storage_location }} is free again.{% endif %}</p>{% endif %}
+<div class="next-buttons">
+{% if item.location_released_at %}<form method="post" action="{% url 'resell:item-ship-undo' item.pk %}">{% csrf_token %}<button class="btn btn-muted">Undo — not shipped yet</button></form>
+{% else %}<form method="post" action="{% url 'resell:item-ship' item.pk %}">{% csrf_token %}<button class="btn btn-primary">I shipped it</button></form>{% endif %}
+<a class="btn btn-muted" href="{% url 'resell:item-return' item.pk %}">The buyer returned it</a>
+<a class="btn btn-muted" href="{% url 'resell:item-sell' item.pk %}">Fix the sale details</a>
+<form method="post" action="{% url 'resell:item-sale-undo' item.pk %}" onsubmit="return confirm('Remove this sale? The item will go back to your stock.');">{% csrf_token %}<button class="btn btn-muted">It didn't really sell — remove the sale</button></form></div>
+{% elif item.status == "written_off" %}
+<p>Written off on {{ item.written_off_date|date:"M j, Y" }}. What you paid ({{ item.purchase_price|money }}) counts as a loss.</p>
+<div class="next-buttons"><form method="post" action="{% url 'resell:item-write-off-undo' item.pk %}">{% csrf_token %}<button class="btn btn-muted">Undo — I still have it</button></form></div>
+{% endif %}
+</section>
+
+<div class="detail-grid">
+<section class="panel" aria-labelledby="money-title"><div class="eyebrow">THE MONEY</div><h2 id="money-title">{% if item.status == "sold" %}Your profit{% else %}What it cost you{% endif %}</h2>
+<div class="detail-line"><span>You paid</span><strong>{{ item.purchase_price|money }}</strong></div>
+{% if item.status == "sold" %}
+<div class="detail-line"><span>Sale price</span><strong>{{ item.sale_price|money }}</strong></div>
+{% if item.shipping_charged %}<div class="detail-line"><span>Shipping the buyer paid</span><strong>{{ item.shipping_charged|money }}</strong></div>{% endif %}
+<div class="detail-line"><span>{{ item.platform }} fees</span><strong>−{{ item.platform_fees|default:0|money }}</strong></div>
+{% if item.shipping_cost %}<div class="detail-line"><span>Shipping label</span><strong>−{{ item.shipping_cost|money }}</strong></div>{% endif %}
+{% if item.other_sale_costs %}<div class="detail-line"><span>Other selling costs</span><strong>−{{ item.other_sale_costs|money }}</strong></div>{% endif %}
+{% if item.return_cost %}<div class="detail-line"><span>Lost on returns</span><strong>−{{ item.return_cost|money }}</strong></div>{% endif %}
+<div class="detail-line highlight"><span>Profit</span><strong class="{{ item.profit|tone }}">{{ item.profit|money:"signed" }}</strong></div>
+<p class="muted small-print">That's a {{ item.roi_percent }}% return on what you paid, and it took {{ item.days_to_sell }} day{{ item.days_to_sell|pluralize }} to sell.</p>
+{% else %}
+{% if item.return_cost %}<div class="detail-line"><span>Lost on returns so far</span><strong class="loss">−{{ item.return_cost|money }}</strong></div>{% endif %}
+{% if item.days_in_inventory is not None %}<p class="muted small-print">In your stock for {{ item.days_in_inventory }} day{{ item.days_in_inventory|pluralize }}.</p>{% endif %}
+{% endif %}
+{% if item.return_date %}<p class="small-print"><a class="link" href="{% url 'resell:item-return-fix' item.pk %}">Fix return details</a>{% if item.return_reason %} <span class="muted">· Returned because: {{ item.return_reason }}</span>{% endif %}</p>{% endif %}
+</section>
+
+<section class="panel" aria-labelledby="facts-title"><div class="eyebrow">THE DETAILS</div><h2 id="facts-title">About this item</h2>
+<div class="detail-line"><span>Bought on</span><span>{{ item.purchase_date|date:"M j, Y" }}</span></div>
+<div class="detail-line"><span>Bought at</span><span>{% if item.source %}{{ item.source }}{% if item.source.has_address %} · <a class="link" href="{{ item.source.map_url }}" target="_blank" rel="noopener">Map ↗</a>{% endif %}{% else %}<span class="muted">Not recorded</span>{% endif %}</span></div>
+<div class="detail-line"><span>{% if item.location_released_at %}Was stored in{% else %}Stored in{% endif %}</span><span>{{ item.storage_location|default:"Not recorded" }}{% if item.location_history %} <span class="muted">· before: {% for old in item.location_history %}{{ old.location }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>{% endif %}</span></div>
+<div class="detail-line"><span>Type</span><span>{% for subcategory in item.subcategories.all %}{{ subcategory }}{% if not forloop.last %}, {% endif %}{% empty %}<span class="muted">Not recorded</span>{% endfor %}</span></div>
+{% if item.sku %}<div class="detail-line"><span>{% if item.item_number %}SKU{% else %}Item code{% endif %}</span><span>{{ item.sku }}</span></div>{% endif %}
+{% if item.description %}<div class="detail-line"><span>Description</span><span>{{ item.description|linebreaksbr }}</span></div>{% endif %}
+{% if item.notes %}<div class="detail-line"><span>Private notes</span><span>{{ item.notes|linebreaksbr }}</span></div>{% endif %}
+</section>
+</div>
+
+<section class="panel recent" aria-labelledby="listings-title">
+<div class="panel-head"><div><div class="eyebrow">WHERE IT'S LISTED</div><h2 id="listings-title">Listings</h2></div>{% if can_list %}<a class="btn btn-primary btn-sm" href="{% url 'resell:listing-create' item.pk %}">＋ Add a listing</a>{% endif %}</div>
+{% if listings %}<p class="muted">One line for each site you listed it on. When you take a listing down, tap <strong>Taken down</strong>.</p>
+<div class="table-scroll"><table><thead><tr><th>SITE</th><th>ASKING PRICE</th><th>LISTED</th><th>STATUS</th><th class="right"></th></tr></thead><tbody>
+{% for listing in listings %}<tr>
+<td data-label="Site"><span class="table-title">{{ listing.platform }}</span>{% if listing.url %}<a class="row-sub link" href="{{ listing.url }}" target="_blank" rel="noopener">Open listing ↗</a>{% endif %}</td>
+<td data-label="Asking price">{{ listing.price|money }}</td>
+<td data-label="Listed">{{ listing.listed_date|date:"M j, Y" }}</td>
+<td data-label="Status"><span class="status status-listing-{{ listing.status }}">{{ listing.get_status_display }}</span>{% if listing.ended_date %}<span class="row-sub">{{ listing.ended_date|date:"M j, Y" }}</span>{% endif %}</td>
+<td data-label="" class="right"><div class="row-actions">
+{% if listing.status == "active" %}<form method="post" action="{% url 'resell:listing-end' listing.pk %}">{% csrf_token %}<button class="btn btn-muted btn-sm">Taken down</button></form>{% endif %}
+<a class="link" href="{% url 'resell:listing-edit' listing.pk %}">Edit</a>
+<a class="danger-link" href="{% url 'resell:listing-delete' listing.pk %}">Remove</a></div></td>
+</tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="muted">Not listed anywhere yet.{% if can_list %} When you put it up for sale, tap <strong>＋ Add a listing</strong>.{% endif %}</p>{% endif %}
+</section>
+
+<section class="panel recent" aria-labelledby="photos-title">
+<div class="panel-head"><div><div class="eyebrow">PHOTOS</div><h2 id="photos-title">Photos</h2></div></div>
+{% if photos %}<p class="muted">The first photo is the main one shown in your item list.</p>
+<ul class="photo-grid">{% for photo in photos %}<li>
+<a href="{{ photo.image.url }}" target="_blank" rel="noopener"><img src="{{ photo.image.url }}" alt="{{ photo.caption|default:item.title }}" loading="lazy"></a>
+<div class="photo-actions">{% if forloop.first %}<span class="muted">Main photo</span>{% else %}<form method="post" action="{% url 'resell:photo-cover' photo.pk %}">{% csrf_token %}<button class="text-link">Make main</button></form>{% endif %}
+<form method="post" action="{% url 'resell:photo-delete' photo.pk %}" onsubmit="return confirm('Delete this photo?');">{% csrf_token %}<button class="text-link danger-link">Delete</button></form></div>
+</li>{% endfor %}</ul>{% endif %}
+<form class="photo-upload" method="post" action="{% url 'resell:photo-add' item.pk %}" enctype="multipart/form-data">{% csrf_token %}
+{% include "resell/_field.html" with field=photo_form.photos %}
+<button class="btn btn-muted" type="submit">Upload photos</button></form>
+</section>
+
+<div class="bottom-actions"><a class="link" href="{% url 'resell:item-list' %}">← Back to my items</a><a class="danger-link" href="{% url 'resell:item-delete' item.pk %}">Delete this item</a></div>
+{% endblock %}

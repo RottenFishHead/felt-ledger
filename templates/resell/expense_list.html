@@ -1,0 +1,27 @@
+{% extends "resell/base.html" %}{% load resell_extras %}
+{% block title %}Expenses · Resell Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent">RESELL / EXPENSES</div><h1>Business <em>expenses.</em></h1>
+<p class="muted">Money spent running the business. These are subtracted from your profit on the home page — and they're the numbers you'll want at tax time.</p></div>
+<a class="btn btn-primary" href="{% url 'resell:expense-create' %}">＋ Add an expense</a></div>
+
+{% if years|length > 1 %}<nav class="stats-tabs" aria-label="Choose a year">{% for y in years %}<a href="?year={{ y }}"{% if y == year %} aria-current="page"{% endif %}>{{ y }}</a>{% endfor %}</nav>{% endif %}
+
+<div class="logbook-summary">
+<div class="stat stat-primary"><div class="stat-label">SPENT IN {{ year }}</div><div class="stat-number">{{ total|money }}</div><div class="stat-foot">{{ expenses|length }} expense{{ expenses|length|pluralize }}</div></div>
+<div class="stat"><div class="stat-label">BUSINESS MILES IN {{ year }}</div><div class="stat-number">{{ miles|floatformat:"-1" }}</div><div class="stat-foot">Driven for buying, selling or shipping</div></div>
+</div>
+{% if by_category %}<div class="category-totals">{% for label, amount in by_category %}<span><span class="muted">{{ label }}</span> <strong>{{ amount|money }}</strong></span>{% endfor %}</div>{% endif %}
+
+<section class="panel recent" aria-labelledby="exp-title"><div class="panel-head"><h2 id="exp-title">Every expense in {{ year }}</h2></div>
+{% if expenses %}<div class="table-scroll"><table><thead><tr><th>WHAT</th><th>DATE</th><th>RECEIPT</th><th class="right">AMOUNT</th><th></th></tr></thead><tbody>
+{% for expense in expenses %}<tr>
+<td data-label="What"><span class="table-title">{{ expense.get_category_display }}</span><span class="row-sub">{{ expense.description }}{% if expense.miles %}{% if expense.description %} · {% endif %}{{ expense.miles|floatformat:"-1" }} mi × ${{ expense.mileage_rate }}{% endif %}</span></td>
+<td data-label="Date">{{ expense.date|date:"M j, Y" }}</td>
+<td data-label="Receipt">{% if expense.receipt %}<a class="link" href="{{ expense.receipt.url }}" target="_blank" rel="noopener">View ↗</a>{% else %}<span class="muted">—</span>{% endif %}</td>
+<td data-label="Amount" class="right"><strong>{{ expense.amount|money }}</strong></td>
+<td data-label="" class="right"><div class="row-actions"><a class="link" href="{% url 'resell:expense-edit' expense.pk %}">Edit</a><a class="danger-link" href="{% url 'resell:expense-delete' expense.pk %}">Delete</a></div></td>
+</tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="muted">No expenses in {{ year }} yet. Tap <strong>＋ Add an expense</strong> to add one.</p>{% endif %}
+</section>
+{% endblock %}

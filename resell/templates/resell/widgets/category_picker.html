@@ -1,0 +1,17 @@
+{% comment %}Item types as a dropdown. Each main type is a fold-out heading (not a checkbox); only sub-types can be ticked.
+app.js adds the "find a type" box and keeps the summary line up to date.{% endcomment %}
+<details class="category-picker" data-category-picker>
+<summary><span class="category-picked" data-picked data-empty="Choose a type…">{% if widget.picked %}{{ widget.picked|join:", " }}{% else %}Choose a type…{% endif %}</span></summary>
+<div class="category-panel">
+<input type="search" class="category-filter" placeholder="Type to find a type…" aria-label="Find a type" data-category-filter hidden>
+{% for group in widget.tree %}
+<details class="category-group" data-category-group{% if group.ticked %} open{% endif %}>
+<summary class="category-main"><span>{{ group.name }}</span><small class="category-count" data-count>{% if group.ticked %}{{ group.ticked }} ticked{% elif group.subs %}{{ group.subs|length }} sub-type{{ group.subs|length|pluralize }}{% else %}No sub-types yet{% endif %}</small></summary>
+{% for sub in group.subs %}<label class="category-option category-sub"><input type="checkbox" name="{{ widget.name }}" value="{{ sub.option.value }}" id="{{ sub.option.attrs.id }}" data-full="{{ sub.full }}"{% if sub.option.selected %} checked{% endif %}><span>{{ sub.name }}</span></label>
+{% empty %}<p class="muted category-hint">Add one with “Add a new sub-type” below.</p>{% endfor %}
+</details>
+{% empty %}<p class="muted category-empty">No types yet. Add your first one in the boxes below.</p>
+{% endfor %}
+<p class="muted category-none" data-category-none hidden>No type matches. Add it in the boxes below.</p>
+</div>
+</details>

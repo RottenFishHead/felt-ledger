@@ -1,0 +1,41 @@
+{% extends "resell/base.html" %}{% load resell_extras %}
+{% block title %}My items · Resell Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent">RESELL / MY ITEMS</div>
+{% if action == "sell" %}<h1>Which item <em>sold?</em></h1><p class="muted">Find it below (use the search box if the list is long) and tap <strong>It sold</strong>.</p>
+{% elif action == "list" %}<h1>Which item did <em>you list?</em></h1><p class="muted">Find it below and tap <strong>I listed it</strong>. Listed it on several sites? Do it once for each site.</p>
+{% else %}<h1>My <em>items.</em></h1><p class="muted">Everything you've bought to resell. Tap an item to see its details, photos and listings.</p>{% endif %}
+</div><a class="btn btn-primary" href="{% url 'resell:item-create' %}">＋ Add an item</a></div>
+
+{% if not action %}<nav class="stats-tabs" aria-label="Show items">
+{% for key, label, statuses in tabs %}<a href="?show={{ key }}"{% if tab == key %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
+{% if tab == "sitting" %}<a href="?show=sitting" aria-current="page">In stock 90+ days</a>{% endif %}
+</nav>{% else %}<p><a class="link" href="{% url 'resell:item-list' %}">← Back to all items</a></p>{% endif %}
+
+<form class="search-row" method="get" role="search">
+{% if action %}<input type="hidden" name="action" value="{{ action }}">{% else %}<input type="hidden" name="show" value="{{ tab }}">{% endif %}
+<label for="q" class="visually-hidden">Search items</label>
+<input id="q" type="search" name="q" value="{{ search }}" placeholder="Search by name, brand, bin or code">
+<button class="btn btn-muted" type="submit">Search</button>
+{% if search %}<a class="link" href="?{% if action %}action={{ action }}{% else %}show={{ tab }}{% endif %}">Clear</a>{% endif %}
+</form>
+
+{% if page.object_list %}
+<div class="table-scroll item-table"><table><thead><tr><th>ITEM</th><th>STATUS</th><th class="right">YOU PAID</th><th class="right">{% if tab == "sold" %}PROFIT{% else %}PRICE{% endif %}</th>{% if action %}<th></th>{% endif %}</tr></thead><tbody>
+{% for item in page.object_list %}<tr>
+<td data-label="Item"><a class="item-cell" href="{% if action == 'sell' %}{% url 'resell:item-sell' item.pk %}{% elif action == 'list' %}{% url 'resell:listing-create' item.pk %}{% else %}{{ item.get_absolute_url }}{% endif %}">
+{% with photo=item.images.all.0 %}{% if photo %}<img class="thumb" src="{{ photo.image.url }}" alt="" loading="lazy">{% else %}<span class="thumb thumb-empty" aria-hidden="true">No photo</span>{% endif %}{% endwith %}
+<span><span class="table-title">{{ item }}</span><span class="row-sub">{% if item.brand %}{{ item.brand }} · {% endif %}{% if item.size %}Size {{ item.size }} · {% endif %}Bought {{ item.purchase_date|date:"M j" }}{% if item.storage_location %} · {{ item.storage_location }}{% endif %}</span></span></a></td>
+<td data-label="Status"><span class="status status-{{ item.status }}">{{ item.get_status_display }}</span>{% if item.status == "listed" %}<span class="row-sub">{% for listing in item.listings.all %}{% if listing.status == "active" %}{{ listing.platform }}{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}</span>{% endif %}</td>
+<td data-label="You paid" class="right">{{ item.purchase_price|money }}</td>
+<td data-label="{% if tab == 'sold' %}Profit{% else %}Price{% endif %}" class="right">{% if item.status == "sold" or item.status == "written_off" %}<span class="money {{ item.profit|tone }}">{{ item.profit|money:"signed" }}</span>{% else %}{% with listing=item.listings.all.0 %}{% if listing.price %}{{ listing.price|money }}{% else %}<span class="muted">—</span>{% endif %}{% endwith %}{% endif %}</td>
+{% if action %}<td data-label="" class="right">{% if action == "sell" %}<a class="btn btn-primary btn-sm" href="{% url 'resell:item-sell' item.pk %}">It sold</a>{% else %}<a class="btn btn-primary btn-sm" href="{% url 'resell:listing-create' item.pk %}">I listed it</a>{% endif %}</td>{% endif %}
+</tr>{% endfor %}
+</tbody></table></div>
+{% if page.has_other_pages %}<div class="pagination">{% if page.has_previous %}<a href="?{% if action %}action={{ action }}{% else %}show={{ tab }}{% endif %}&q={{ search|urlencode }}&page={{ page.previous_page_number }}">← Previous</a>{% else %}<span></span>{% endif %}<span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>{% if page.has_next %}<a href="?{% if action %}action={{ action }}{% else %}show={{ tab }}{% endif %}&q={{ search|urlencode }}&page={{ page.next_page_number }}">Next →</a>{% else %}<span></span>{% endif %}</div>{% endif %}
+{% else %}
+<div class="empty-state">{% if search %}<p>Nothing matches “{{ search }}”. Check the spelling, or <a class="link" href="?{% if action %}action={{ action }}{% else %}show={{ tab }}{% endif %}">clear the search</a>.</p>
+{% elif action %}<p>You don't have any unsold items yet. Start by tapping <strong>＋ Add an item</strong>.</p>
+{% else %}<p>No items here yet.</p><a class="btn btn-primary" href="{% url 'resell:item-create' %}">＋ Add your first item</a>{% endif %}</div>
+{% endif %}
+{% endblock %}

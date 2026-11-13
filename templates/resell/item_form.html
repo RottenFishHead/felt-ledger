@@ -1,0 +1,48 @@
+{% extends "resell/base.html" %}
+{% block title %}{% if item %}Edit {{ item }}{% else %}Add an item{% endif %} · Resell Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent">{% if item %}EDIT ITEM{% else %}I BOUGHT SOMETHING{% endif %}</div>
+<h1>{% if item %}Edit <em>{{ item }}</em>{% else %}Add an <em>item.</em>{% endif %}</h1>
+<p class="muted">{% if item %}Change anything below, then tap <strong>Save changes</strong> at the bottom.{% else %}Fill in what you know — only the boxes marked <strong>(required)</strong> must be filled in. You can always come back and add more later.{% endif %}</p></div></div>
+
+<section class="panel form-panel"><form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+{% include "resell/_form_errors.html" %}
+
+<fieldset class="form-step"><legend><span class="step-number">1</span> The item</legend>
+{% include "resell/_field.html" with field=form.title %}
+{% include "resell/_field.html" with field=form.brand_name %}
+<datalist id="brand-options">{% for name in form.brand_options %}<option value="{{ name }}">{% endfor %}</datalist>
+{% include "resell/_field.html" with field=form.subcategories %}
+<div class="form-grid">{% include "resell/_field.html" with field=form.new_subcategories %}{% include "resell/_field.html" with field=form.new_subcategory_category %}</div>
+<datalist id="main-type-options">{% for name in form.main_type_options %}<option value="{{ name }}">{% endfor %}</datalist>
+<div class="form-grid">{% include "resell/_field.html" with field=form.size %}{% include "resell/_field.html" with field=form.color %}</div>
+{% include "resell/_field.html" with field=form.condition %}
+</fieldset>
+
+<fieldset class="form-step"><legend><span class="step-number">2</span> Buying it</legend>
+<div class="form-grid">{% include "resell/_field.html" with field=form.purchase_date %}{% include "resell/_field.html" with field=form.purchase_price %}</div>
+{% include "resell/_field.html" with field=form.source %}
+{% include "resell/_field.html" with field=form.new_source_name %}
+</fieldset>
+
+<fieldset class="form-step"><legend><span class="step-number">3</span> Photos</legend>
+{% if item and item.images.exists %}<p class="muted">This item already has {{ item.images.count }} photo{{ item.images.count|pluralize }}. Any you add here are added to them — to delete a photo, go back to the item page.</p>{% endif %}
+{% include "resell/_field.html" with field=form.photos %}
+</fieldset>
+
+<fieldset class="form-step"><legend><span class="step-number">4</span> Extras <span class="muted">(all optional)</span></legend>
+{% if form.uses_slots %}<div class="slot-picker" data-slot-picker data-check-url="{% url 'resell:location-check' %}" data-next-bin-url="{% url 'resell:location-next-bin' %}">
+<div class="form-grid">{% include "resell/_field.html" with field=form.storage_location %}{% include "resell/_field.html" with field=form.sku %}</div>
+{% if not form.storage_location.field.disabled %}<button type="button" class="btn btn-secondary btn-sm" data-next-bin>Bin full → next bin</button>{% endif %}
+</div>
+{% else %}{% include "resell/_field.html" with field=form.storage_location %}{% endif %}
+{% include "resell/_field.html" with field=form.description %}
+{% include "resell/_field.html" with field=form.notes %}
+{% if not form.uses_slots %}{% include "resell/_field.html" with field=form.sku %}{% endif %}
+{{ form.offered_location }}
+</fieldset>
+
+<div class="form-actions"><button type="submit" class="btn btn-primary">{% if item %}Save changes{% else %}Save this item{% endif %}</button>
+<a class="btn btn-muted" href="{% if item %}{{ item.get_absolute_url }}{% else %}{% url 'resell:home' %}{% endif %}">Cancel</a></div>
+</form></section>
+{% endblock %}

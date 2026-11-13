@@ -1,0 +1,8 @@
+{% extends "resell/form_page.html" %}
+{% comment %}Add/edit page for both main types (Category) and sub-types (SubCategory) — `obj` is the one being edited.{% endcomment %}
+{% block title %}Item type · Resell Ledger{% endblock %}
+{% block eyebrow %}ITEM TYPES{% endblock %}
+{% block heading %}{% if obj.pk %}Edit <em>{{ obj }}</em>{% elif obj.category_id %}Add a sub-type to <em>{{ obj.category }}</em>{% else %}Add a <em>main type.</em>{% endif %}{% endblock %}
+{% block intro %}<p class="muted">A main type like “Shoes” groups sub-types like “Sneakers”. Items always get a sub-type. Renaming a type changes it on every item that has it.</p>{% endblock %}
+{% block submit %}Save{% endblock %}
+{% block cancel %}{% url 'resell:category-list' %}{% endblock %}

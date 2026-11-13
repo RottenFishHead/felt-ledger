@@ -1,0 +1,20 @@
+{% extends "resell/form_page.html" %}
+{% block title %}It sold · Resell Ledger{% endblock %}
+{% block heading %}{% if form.editing_sale %}Fix the <em>sale.</em>{% else %}It <em>sold!</em>{% endif %}{% endblock %}
+{% block intro %}<div class="help-box"><strong>Tip:</strong> open the sale (or order) on the site's app — it shows the price, shipping and fees. Copy those numbers here.
+{% if form.selling_new_after_return %}<br>This item was returned earlier, so this is a new sale. What you lost on the return is already counted.{% endif %}</div>{% endblock %}
+{% block fields %}
+<fieldset class="form-step"><legend><span class="step-number">1</span> The sale</legend>
+{% include "resell/_field.html" with field=form.platform %}
+<div class="form-grid">{% include "resell/_field.html" with field=form.sale_date %}{% include "resell/_field.html" with field=form.sale_price %}</div>
+</fieldset>
+<fieldset class="form-step"><legend><span class="step-number">2</span> Shipping</legend>
+<div class="form-grid">{% include "resell/_field.html" with field=form.shipping_charged %}{% include "resell/_field.html" with field=form.shipping_cost %}</div>
+</fieldset>
+<fieldset class="form-step"><legend><span class="step-number">3</span> Fees & costs</legend>
+{% include "resell/_field.html" with field=form.platform_fees %}
+{% if form.recalculate_fees %}{% include "resell/_field.html" with field=form.recalculate_fees %}{% endif %}
+{% include "resell/_field.html" with field=form.other_sale_costs %}
+</fieldset>
+{% endblock %}
+{% block submit %}{% if form.editing_sale %}Save changes{% else %}Record the sale{% endif %}{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{% if location %}{{ location.name }}{% else %}Location{% endif %} statistics · Donkey Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent">YOUR PERFORMANCE / BY LOCATION</div>
+{% if not selected %}<h1>Where you <em>win.</em></h1><p class="muted">Every room you've played, ranked by net result.</p>
+{% elif location %}<h1>{{ location.name }}</h1><p class="muted">{% if location.has_address %}{{ location.full_address }} · {% endif %}{{ location.get_rating_display }}</p>
+{% elif not invalid_selection %}<h1>No <em>location.</em></h1><p class="muted">Sessions recorded without a location.</p>
+{% else %}<h1>Session <em>statistics.</em></h1>{% endif %}
+</div></div>
+{% include "sessions/_stats_tabs.html" %}
+
+{% if invalid_selection %}
+<p class="error" role="alert">That location isn't available. <a class="link" href="{% url 'statistics-location' %}">See all locations →</a></p>
+
+{% elif selected %}
+<div class="logbook-summary" aria-label="Statistics for this location">
+<div class="stat stat-primary"><div class="stat-label">NET PROFIT</div><div class="stat-number {% if profit < 0 %}loss{% endif %}">{% if profit > 0 %}+{% endif %}${{ profit|floatformat:2 }}</div><div class="stat-foot">From {{ completed_count }} completed session{{ completed_count|pluralize }}</div></div>
+<div class="stat"><div class="stat-label">WIN RATE</div><div class="stat-number">{{ win_rate }}<small>%</small></div><div class="stat-foot">{{ wins }} win{{ wins|pluralize }} · {{ losses }} loss{{ losses|pluralize:"es" }} · {{ break_even }} break-even</div></div>
+<div class="stat"><div class="stat-label">HOURLY RATE</div><div class="stat-number {% if hourly_rate < 0 %}loss{% endif %}">${{ hourly_rate|floatformat:2 }}<small>/hr</small></div><div class="stat-foot">Net profit per hour played</div></div>
+</div>
+{% if location.has_address %}<section class="panel location-map"><div class="panel-head"><div><div class="eyebrow">THE ROOM</div><h2>Map</h2></div><a class="link" href="{{ location.map_url }}" target="_blank" rel="noopener">Open in Maps ↗</a></div><iframe src="{{ location.map_embed_url }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Map of {{ location.name }}"></iframe></section>{% endif %}
+<section class="panel recent"><div class="panel-head"><h2>Sessions here</h2><a class="link" href="{% url 'statistics-location' %}">← All locations</a></div>
+{% include "sessions/_table.html" with sessions=sessions %}
+</section>
+
+{% elif rows %}
+<section class="panel recent location-ranking"><div class="panel-head"><div><div class="eyebrow">THE RANKING</div><h2>Results by location</h2></div></div>
+<div class="table-scroll"><table><thead><tr><th>LOCATION</th><th class="right">SESSIONS</th><th>WINS / LOSSES</th><th class="right">WIN RATE</th><th class="right">HOURLY</th><th class="right">NET RESULT</th></tr></thead><tbody>
+{% for row in rows %}<tr>
+<td data-label="Location"><a class="table-title" href="?location={{ row.key }}">{{ row.location.name|default:"No location" }}</a>{% if row.location.has_address %}<span class="row-sub">{{ row.location.city }}{% if row.location.state %}, {{ row.location.state }}{% endif %}</span>{% endif %}</td>
+<td data-label="Sessions" class="right">{{ row.completed_count }}</td>
+<td data-label="Wins / losses"><span class="wl-cell"><span class="wl"><span class="{% if row.wins %}gain{% else %}muted{% endif %}">{{ row.wins }}W</span> · <span class="{% if row.losses %}loss{% else %}muted{% endif %}">{{ row.losses }}L</span>{% if row.break_even %} · <span class="muted">{{ row.break_even }} even</span>{% endif %}</span><span class="wl-bar" aria-hidden="true"><i class="wl-win" style="flex-grow:{{ row.wins }}"></i><i class="wl-even" style="flex-grow:{{ row.break_even }}"></i><i class="wl-loss" style="flex-grow:{{ row.losses }}"></i></span></span></td>
+<td data-label="Win rate" class="right">{{ row.win_rate }}%</td>
+<td data-label="Hourly" class="right {% if row.hourly_rate < 0 %}loss{% endif %}">${{ row.hourly_rate|floatformat:2 }}/hr</td>
+<td data-label="Net result" class="right"><span class="money {% if row.profit > 0 %}gain{% elif row.profit < 0 %}loss{% endif %}">{% if row.profit > 0 %}+{% endif %}${{ row.profit|floatformat:2 }}</span></td>
+</tr>{% endfor %}
+</tbody></table></div>
+</section>
+
+{% else %}
+<section class="panel empty-chart"><span>♧</span><p>Finish a session at a location to see how each room treats you.</p><a href="{% url 'session-create' %}">Start a session →</a></section>
+{% endif %}
+{% endblock %}

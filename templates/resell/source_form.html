@@ -1,0 +1,14 @@
+{% extends "resell/form_page.html" %}
+{% block title %}Place · Resell Ledger{% endblock %}
+{% block eyebrow %}PLACES I BUY{% endblock %}
+{% block heading %}{% if source.pk %}Edit <em>{{ source }}</em>{% else %}Add a <em>place.</em>{% endif %}{% endblock %}
+{% block intro %}<p class="muted">A store, sale or website where you buy items. Add the address to get a map and directions.</p>{% endblock %}
+{% block fields %}
+{% include "resell/_field.html" with field=form.name %}
+{% include "resell/_field.html" with field=form.kind %}
+{% include "resell/_field.html" with field=form.street_address %}
+{% include "resell/_field.html" with field=form.address_line_2 %}
+<div class="form-grid form-grid-3">{% include "resell/_field.html" with field=form.city %}{% include "resell/_field.html" with field=form.state %}{% include "resell/_field.html" with field=form.postal_code %}</div>
+{% endblock %}
+{% block submit %}Save place{% endblock %}
+{% block cancel %}{% url 'resell:source-list' %}{% endblock %}

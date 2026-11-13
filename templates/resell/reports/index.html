@@ -1,0 +1,13 @@
+{% extends "resell/base.html" %}
+{% block title %}Reports · Resell Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent">RESELL / REPORTS</div><h1>Your <em>reports.</em></h1>
+<p class="muted">Pick a report to see your numbers. Every report can be downloaded as a PDF for your records or your tax preparer.</p></div></div>
+
+<div class="report-index">{% for group, entries in catalog %}
+<section class="report-group" aria-labelledby="g{{ forloop.counter }}"><h2 id="g{{ forloop.counter }}">{{ group }}</h2>
+<ul>{% for name, title, description in entries %}{% with "resell:"|add:name as url_name %}
+<li><a href="{% url url_name %}"><strong>{{ title }}</strong><span>{{ description }}</span></a></li>
+{% endwith %}{% endfor %}</ul></section>
+{% endfor %}</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}{% block title %}{{ selection_label }} statistics · Donkey Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent">YOUR PERFORMANCE</div><h1>Session <em>statistics.</em></h1><p class="muted">Review your results by month, year, stakes, or location.</p></div></div>
+{% include "sessions/_stats_tabs.html" %}
+<section class="panel statistics-filter">
+<form method="get">
+<div class="field"><label for="selection">{{ selection_label }}</label><select id="selection" name="selection" required>
+<option value="">Choose {{ selection_label|lower }}</option>
+{% for value, label in selection_choices %}<option value="{{ value }}"{% if selected == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+</select></div>
+<button class="btn btn-primary" type="submit">Show results</button>
+</form>
+</section>
+{% if invalid_selection %}<p class="error" role="alert">That selection is not available. Choose an option from the list.</p>
+{% elif has_selection %}
+<div class="logbook-summary" aria-label="Statistics for selected sessions">
+<div class="stat stat-primary"><div class="stat-label">NET PROFIT</div><div class="stat-number {% if profit < 0 %}loss{% endif %}">{% if profit > 0 %}+{% endif %}${{ profit|floatformat:2 }}</div><div class="stat-foot">From {{ completed_count }} completed session{{ completed_count|pluralize }}</div></div>
+<div class="stat"><div class="stat-label">WIN RATE</div><div class="stat-number">{{ win_rate }}<small>%</small></div><div class="stat-foot">{{ wins }} wins · {{ losses }} losses · {{ break_even }} break-even</div></div>
+<div class="stat"><div class="stat-label">HOURLY RATE</div><div class="stat-number {% if hourly_rate < 0 %}loss{% endif %}">${{ hourly_rate|floatformat:2 }}<small>/hr</small></div><div class="stat-foot">Net profit per hour played</div></div>
+</div>
+<section class="panel recent"><div class="panel-head"><h2>Matching sessions</h2></div>
+{% include "sessions/_table.html" with sessions=sessions %}
+</section>
+{% else %}<section class="panel empty-chart"><p>Choose a {{ selection_label|lower }} above to see your results.</p></section>{% endif %}
+{% endblock %}

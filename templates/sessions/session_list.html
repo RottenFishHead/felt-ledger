@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block title %}Sessions · Donkey Ledger{% endblock %}
+{% block content %}<div class="page-header"><div><div class="eyebrow accent">YOUR ARCHIVE</div><h1>Session <em>logbook.</em></h1><p class="muted">Every session, all in one place.</p></div></div>
+<div class="logbook-summary" aria-label="Overall session statistics">
+<div class="stat"><div class="stat-label">AMOUNT WON/LOST OVERALL</div><div class="stat-number {% if profit < 0 %}loss{% endif %}">{% if profit > 0 %}+{% endif %}${{ profit|floatformat:2 }}</div><div class="stat-foot">Net result from {{ completed_count }} completed session{{ completed_count|pluralize }}</div></div>
+<div class="stat"><div class="stat-label">HOURLY RATE</div><div class="stat-number {% if hourly_rate < 0 %}loss{% endif %}">${{ hourly_rate|floatformat:2 }}<small>/hr</small></div><div class="stat-foot">Net profit per hour played</div></div>
+</div>
+<section class="panel recent"><div class="panel-head"><h2>All sessions</h2><a class="btn btn-primary btn-sm" href="{% url 'session-create' %}">+ New session</a></div>
+{% include "sessions/_table.html" %}
+{% if is_paginated %}<div class="pagination">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">← Previous</a>{% endif %}<span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Next →</a>{% endif %}</div>{% endif %}
+</section>{% endblock %}

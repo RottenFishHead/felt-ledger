@@ -1,0 +1,15 @@
+{% extends "resell/base.html" %}
+{% block title %}Item types · Resell Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent"><a href="{% url 'resell:home' %}">HOME</a> / SET-UP</div><h1>Item <em>types.</em></h1>
+<p class="muted">Main types group your sub-types, e.g. Shoes › Sneakers. Items always get a sub-type. Tap <strong>Edit</strong> to rename a sub-type or move it to another main type.</p></div>
+<a class="btn btn-primary" href="{% url 'resell:category-create' %}">＋ Add a main type</a></div>
+{% if categories %}<ul class="place-list type-list">{% for category in categories %}{% with subs=category.subcategories.all %}
+<li><div><strong>{{ category.name }}</strong> <span class="muted">· {% if subs %}{{ subs|length }} sub-type{{ subs|length|pluralize }} · {{ category.item_count }} item{{ category.item_count|pluralize }}{% else %}no sub-types yet{% endif %}</span></div>
+<div class="row-actions"><a class="link" href="{% url 'resell:category-edit' category.pk %}">Rename</a>{% if not subs %}<a class="danger-link" href="{% url 'resell:category-delete' category.pk %}">Delete</a>{% endif %}</div></li>
+{% for sub in subs %}<li class="type-sub"><div><span aria-hidden="true" class="muted">└</span> {{ sub.name }} <span class="muted">· {{ sub.items.count }} item{{ sub.items.count|pluralize }}</span></div>
+<div class="row-actions"><a class="link" href="{% url 'resell:subcategory-edit' sub.pk %}">Edit</a><a class="danger-link" href="{% url 'resell:subcategory-delete' sub.pk %}">Delete</a></div></li>{% endfor %}
+<li class="type-sub"><a class="link" href="{% url 'resell:subcategory-create' category.pk %}">＋ Add a sub-type to {{ category.name }}</a></li>
+{% endwith %}{% endfor %}</ul>
+{% else %}<div class="empty-state"><p>No item types yet.</p></div>{% endif %}
+{% endblock %}

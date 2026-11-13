@@ -1,0 +1,7 @@
+{% extends "resell/base.html" %}
+{% block title %}Are you sure? · Resell Ledger{% endblock %}
+{% block content %}
+<div class="page-header"><div><div class="eyebrow accent">PLEASE CONFIRM</div><h1>{{ title }}</h1><p class="muted">{{ message }}</p></div></div>
+<section class="panel form-panel"><p><strong>This can't be undone.</strong></p><form method="post" class="form-actions">{% csrf_token %}
+<button class="btn btn-danger" type="submit">Yes, delete it</button><a class="btn btn-muted" href="{{ cancel_url }}">No, go back</a></form></section>
+{% endblock %}
